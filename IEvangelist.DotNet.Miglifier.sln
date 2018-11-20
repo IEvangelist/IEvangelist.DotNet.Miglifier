@@ -3,7 +3,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28010.2041
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IEvangelist.DotNet.Miglifier", "IEvangelist.DotNet.Miglifier\IEvangelist.DotNet.Miglifier.csproj", "{E1A1F1F4-2345-470B-BB0D-256E23877CCD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IEvangelist.DotNet.Miglifier", "IEvangelist.DotNet.Miglifier\IEvangelist.DotNet.Miglifier.csproj", "{E1A1F1F4-2345-470B-BB0D-256E23877CCD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IEvangelist.DotNet.MiglifierTests", "IEvangelist.DotNet.MiglifierTests\IEvangelist.DotNet.MiglifierTests.csproj", "{D4C7F03E-F01E-4A2E-98C4-EC98F124092F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B21C88EB-9CC8-4118-A158-2EF3850719E9}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +22,10 @@ Global
 		{E1A1F1F4-2345-470B-BB0D-256E23877CCD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E1A1F1F4-2345-470B-BB0D-256E23877CCD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E1A1F1F4-2345-470B-BB0D-256E23877CCD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D4C7F03E-F01E-4A2E-98C4-EC98F124092F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4C7F03E-F01E-4A2E-98C4-EC98F124092F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4C7F03E-F01E-4A2E-98C4-EC98F124092F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4C7F03E-F01E-4A2E-98C4-EC98F124092F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

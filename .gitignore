@@ -7,6 +7,10 @@
 *.userosscache
 *.sln.docstates
 
+# Miglified bits
+[Dd]ist/
+*.min.*
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 

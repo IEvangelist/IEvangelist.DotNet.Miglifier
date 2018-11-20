@@ -1,12 +1,25 @@
-﻿using System;
+﻿using McMaster.Extensions.CommandLineUtils;
+using System;
+using System.Threading.Tasks;
 
 namespace IEvangelist.DotNet.Miglifier
 {
     class Program
     {
-        static void Main(string[] args)
+        public static async Task<int> Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            try
+            {
+                return await CommandLineApplication.ExecuteAsync<Miglifier>(args);
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Error.WriteLine($"Unexpected error: {ex}");
+                Console.ResetColor();
+
+                return 1;
+            }
         }
     }
 }
