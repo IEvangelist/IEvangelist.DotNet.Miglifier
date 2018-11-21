@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
 
 namespace IEvangelist.DotNet.Miglifier.Core
@@ -21,48 +22,80 @@ namespace IEvangelist.DotNet.Miglifier.Core
             MatchCasing = MatchCasing.CaseInsensitive
         };
 
-        internal static MiglifyResult Miglify(string wwwroot, IConsole console = null)
+        static IConsole Console { get; } = PhysicalConsole.Singleton;
+
+        internal static async Task<MiglifyResult> MiglifyAsync(string wwwroot)
         {
             if (!Directory.Exists(wwwroot))
             {
                 throw new ArgumentException("The given directory does not exist.", nameof(wwwroot));
             }
 
-            console = console ?? PhysicalConsole.Singleton;
-
             try
             {
+                WriteLine("Scanning for CSS, JavaScript and HTML files to process.", ConsoleColor.Cyan);
+                WriteLine();
+
                 var results =
                     GetCssFiles(wwwroot)
-                        .Select(css => (path: css, type: TargetType.Css, result: Uglify.Css(File.ReadAllText(css))))
-                        .Concat(GetJsFiles(wwwroot).Select(js => (path: js, type: TargetType.Js, result: Uglify.Js(File.ReadAllText(js))))
-                        .Concat(GetHtmlFiles(wwwroot).Select(html => (path: html, type: TargetType.Html, result: Uglify.Html(File.ReadAllText(html))))));
-
-                bool IsErrorFree(UglifyResult result)
-                {
-                    result.Errors?.ForEach(console.Error.WriteLine);
-                    return !result.HasErrors;
-                };
+                       .Select(css => new MiglifyFile(TargetType.Css, css))
+                       .Concat(GetJsFiles(wwwroot)
+                                  .Select(js => new MiglifyFile(TargetType.Js, js)))
+                       .Concat(GetHtmlFiles(wwwroot)
+                                  .Select(html => new MiglifyFile(TargetType.Html, html)));
 
                 var buffer = new List<(string InputPath, string OutputPath, TargetType Type)>();
-                foreach (var (path, type, result) in results.Where(_ => IsErrorFree(_.result)))
+                foreach (var (type, files) in results.GroupBy(f => f.Type)
+                                                     .ToDictionary(grp => grp.Key, grp => grp.ToList()))
                 {
-                    var file = new FileInfo(path);
-                    var minifiedName = $"{Path.GetFileNameWithoutExtension(file.Name)}.min{file.Extension}";
-                    var minifiedPath = Path.Combine(file.DirectoryName, minifiedName);
+                    WriteLine($"Processing {files.Count} {type} file(s).");
 
-                    File.WriteAllText(minifiedPath, result.Code);
-                    buffer.Add((path, minifiedPath, type));
-                    console.WriteLine($"Minified ${type}: {minifiedPath}");
+                    foreach (var (path, resultTask) in files)
+                    {
+                        var result = await resultTask;
+                        if (!IsErrorFree(result))
+                        {
+                            continue;
+                        }
+
+                        var file = new FileInfo(path);
+                        var minifiedName = $"{Path.GetFileNameWithoutExtension(file.Name)}.min{file.Extension}";
+                        var minifiedPath = Path.Combine(file.DirectoryName, minifiedName);
+
+                        await File.WriteAllTextAsync(minifiedPath, result.Code);
+                        buffer.Add((path, minifiedPath, type));
+                        WriteLine($"\t{minifiedPath}", ConsoleColor.DarkCyan);
+                    }
+
+                    WriteLine();
                 }
+
+                WriteLine($"Successfully miglified {buffer.Count} files!", ConsoleColor.Cyan);
 
                 return new MiglifyResult(0, buffer);
             }
             catch (Exception ex)
             {
-                console.Error.WriteLine(ex);
+                WriteError(ex);
                 return new MiglifyResult(2);
             }
+        }
+
+        static bool IsErrorFree(UglifyResult result)
+        {
+            result.Errors?.ForEach(e =>
+            {
+                if (e.IsError)
+                {
+                    WriteError($"\t{e}");
+                }
+                else
+                {
+                    WriteLine($"\t{e}", ConsoleColor.DarkYellow);
+                }
+            });
+
+            return !result.HasErrors;
         }
 
         static IEnumerable<FileInfo> GetAllFiles(string wwwroot, string searchPattern) 
@@ -82,5 +115,38 @@ namespace IEvangelist.DotNet.Miglifier.Core
             => GetAllFiles(wwwroot, $"*{extension}")
                    .Where(file => !file.Name.Contains(".min.", StringComparison.OrdinalIgnoreCase))
                    .Select(file => file.FullName);
+
+        static void WriteLine(string message = null, ConsoleColor? color = null)
+        {
+            try
+            {
+                Console.ForegroundColor = color ?? Console.ForegroundColor;
+                if (message is null)
+                {
+                    Console.WriteLine();
+                }
+                else
+                {
+                    Console.WriteLine(message);
+                }
+            }
+            finally
+            {
+                Console.ResetColor();
+            }
+        }
+
+        static void WriteError(object message)
+        {
+            try
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Error.WriteLine(message);
+            }
+            finally
+            {
+                Console.ResetColor();
+            }
+        }
     }
 }

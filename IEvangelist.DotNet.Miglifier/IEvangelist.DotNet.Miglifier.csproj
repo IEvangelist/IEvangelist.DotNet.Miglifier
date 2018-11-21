@@ -5,8 +5,13 @@
     <IsPackable>true</IsPackable>
     <PackAsTool>true</PackAsTool>
     <LangVersion>latest</LangVersion>
+    <Title>dotnet-miglifier</Title>
+    <ToolCommandName>dotnet-miglifier</ToolCommandName>
     <AssemblyName>dotnet-miglifier</AssemblyName>
+    <Authors>IEvangelist</Authors>
     <Description>A simple tool for minifying and uglifying .html, .css and .js files.</Description>
+    <PackageLicenseUrl>https://github.com/IEvangelist/IEvangelist.DotNet.Miglifier/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/IEvangelist/IEvangelist.DotNet.Miglifier</PackageProjectUrl>
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <ApplicationIcon>favicon.ico</ApplicationIcon>
   </PropertyGroup>

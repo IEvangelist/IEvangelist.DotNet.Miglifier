@@ -3,6 +3,7 @@ using McMaster.Extensions.CommandLineUtils;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace IEvangelist.DotNet.Miglifier
 {
@@ -19,11 +20,11 @@ namespace IEvangelist.DotNet.Miglifier
         [
             FileOrDirectoryExists,
             Required(ErrorMessage = Constants.PathErrorMessage),
-            Argument(0, Name = Constants.PathName, Description = Constants.PathDescription)
+            Argument(0, Constants.PathName, Constants.PathDescription)
         ]
         public string Path { get; }
 
-        public int OnExcute(CommandLineApplication app, IConsole console)
+        public async Task<int> OnExecuteAsync(CommandLineApplication app)
         {
             if (!Directory.Exists(Path))
             {
@@ -31,7 +32,7 @@ namespace IEvangelist.DotNet.Miglifier
                 return 1;
             }
 
-            var result = MinifierAndUglifier.Miglify(Path, console);
+            var result = await MinifierAndUglifier.MiglifyAsync(Path);
             return result.ExitCode;
         }
     }
