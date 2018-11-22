@@ -20,22 +20,22 @@ namespace IEvangelist.DotNet.MiglifierTests
             var startDateTime = DateTime.UtcNow;
             var result = await MinifierAndUglifier.MiglifyAsync("wwwroot");
             Assert.True(result.ExitCode == 0, "Expected successful execution.");
-            Assert.True(result.Output.Any(), "Expected results to have output.");
+            Assert.True(result.Files.Any(), "Expected results to have output.");
 
-            foreach (var (input, output, type) in result.Output)
+            foreach (var file in result.Files)
             {
-                var originalSize = new FileInfo(input).Length;
-                var minifiedFile = new FileInfo(output);
+                var originalSize = new FileInfo(file.OriginalPath).Length;
+                var minifiedFile = new FileInfo(file.MiglifiedPath);
 
                 Assert.True(originalSize > minifiedFile.Length,
-                            $"Expected minification to make {type} file smaller.");
+                            $"Expected minification to make {file.Type} file smaller.");
                 Assert.True(minifiedFile.LastWriteTimeUtc > startDateTime,
-                            $"Expected {type} file to have been updated.");
+                            $"Expected {file.Type} file to have been updated.");
             }
 
-            Assert.Contains(result.Output, _ => _.Type == TargetType.Css);
-            Assert.Contains(result.Output, _ => _.Type == TargetType.Js);
-            Assert.Contains(result.Output, _ => _.Type == TargetType.Html);
+            Assert.Contains(result.Files, _ => _.Type == TargetType.Css);
+            Assert.Contains(result.Files, _ => _.Type == TargetType.Js);
+            Assert.Contains(result.Files, _ => _.Type == TargetType.Html);
         }
 
         [
@@ -49,12 +49,12 @@ namespace IEvangelist.DotNet.MiglifierTests
             var startDateTime = DateTime.UtcNow;
             var result = await MinifierAndUglifier.MiglifyAsync(path);
             Assert.True(result.ExitCode == 0, "Expected successful execution.");
-            Assert.True(result.Output.Any(), "Expected results to have output.");
+            Assert.True(result.Files.Any(), "Expected results to have output.");
 
-            foreach (var (input, output, _) in result.Output)
+            foreach (var file in result.Files)
             {
-                var originalSize = new FileInfo(input).Length;
-                var minifiedFile = new FileInfo(output);
+                var originalSize = new FileInfo(file.OriginalPath).Length;
+                var minifiedFile = new FileInfo(file.MiglifiedPath);
 
                 Assert.True(originalSize > minifiedFile.Length,
                             $"Expected minification to make {type} file smaller.");
@@ -62,7 +62,7 @@ namespace IEvangelist.DotNet.MiglifierTests
                             $"Expected {type} file to have been updated.");
             }
 
-            Assert.True(result.Output.All(t => t.Type == type),
+            Assert.True(result.Files.All(t => t.Type == type),
                         $"Expected {type} output.");
         }
     }

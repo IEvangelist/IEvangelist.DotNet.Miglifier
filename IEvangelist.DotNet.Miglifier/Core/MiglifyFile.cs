@@ -11,6 +11,8 @@ namespace IEvangelist.DotNet.Miglifier.Core
 
         internal string OriginalPath { get; }
 
+        internal string MiglifiedPath { get; set; }
+
         internal Task<UglifyResult> ProcessAsync { get; }
 
         internal MiglifyFile(TargetType type, string originalPath)

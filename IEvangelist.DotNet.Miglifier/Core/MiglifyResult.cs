@@ -6,14 +6,14 @@ namespace IEvangelist.DotNet.Miglifier.Core
     {
         internal int ExitCode { get; }
 
-        internal IEnumerable<(string InputPath, string OutputPath, TargetType Type)> Output { get; }
+        internal IEnumerable<MiglifyFile> Files { get; }
 
         internal MiglifyResult(
             int exitCode,
-            IEnumerable<(string InputPath, string OutputPath, TargetType Type)> output = null)
+            IEnumerable<MiglifyFile> files = null)
         {
             ExitCode = exitCode;
-            Output = output;
+            Files = files;
         }
     }
 }

@@ -44,26 +44,28 @@ namespace IEvangelist.DotNet.Miglifier.Core
                        .Concat(GetHtmlFiles(wwwroot)
                                   .Select(html => new MiglifyFile(TargetType.Html, html)));
 
-                var buffer = new List<(string InputPath, string OutputPath, TargetType Type)>();
+                var buffer = new List<MiglifyFile>();
                 foreach (var (type, files) in results.GroupBy(f => f.Type)
                                                      .ToDictionary(grp => grp.Key, grp => grp.ToList()))
                 {
                     WriteLine($"Processing {files.Count} {type} file(s).");
 
-                    foreach (var (path, resultTask) in files)
+                    foreach (var file in files)
                     {
+                        var (path, resultTask) = file;
                         var result = await resultTask;
                         if (!IsErrorFree(result))
                         {
                             continue;
                         }
 
-                        var file = new FileInfo(path);
-                        var minifiedName = $"{Path.GetFileNameWithoutExtension(file.Name)}.min{file.Extension}";
-                        var minifiedPath = Path.Combine(file.DirectoryName, minifiedName);
+                        var info = new FileInfo(path);
+                        var minifiedName = $"{Path.GetFileNameWithoutExtension(info.Name)}.min{info.Extension}";
+                        var minifiedPath = Path.Combine(info.DirectoryName, minifiedName);
 
-                        await File.WriteAllTextAsync(minifiedPath, result.Code);
-                        buffer.Add((path, minifiedPath, type));
+                        await File.WriteAllTextAsync(file.MiglifiedPath = minifiedPath, result.Code);
+
+                        buffer.Add(file);
                         WriteLine($"\t{minifiedPath}", ConsoleColor.DarkCyan);
                     }
 
