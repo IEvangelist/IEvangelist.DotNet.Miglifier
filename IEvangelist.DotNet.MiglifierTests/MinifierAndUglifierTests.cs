@@ -17,19 +17,18 @@ namespace IEvangelist.DotNet.MiglifierTests
         [Fact]
         public async Task MinifiesAndUglifiesAllContentsOfWwwRoot()
         {
-            var startDateTime = DateTime.UtcNow;
             var result = await MinifierAndUglifier.MiglifyAsync("wwwroot");
             Assert.True(result.ExitCode == 0, "Expected successful execution.");
             Assert.True(result.Files.Any(), "Expected results to have output.");
 
             foreach (var file in result.Files)
             {
-                var originalSize = new FileInfo(file.OriginalPath).Length;
+                var originalFile = new FileInfo(file.OriginalPath);
                 var minifiedFile = new FileInfo(file.MiglifiedPath);
 
-                Assert.True(originalSize > minifiedFile.Length,
+                Assert.True(originalFile.Length > minifiedFile.Length,
                             $"Expected minification to make {file.Type} file smaller.");
-                Assert.True(minifiedFile.LastWriteTimeUtc > startDateTime,
+                Assert.True(minifiedFile.LastWriteTimeUtc > originalFile.LastWriteTimeUtc,
                             $"Expected {file.Type} file to have been updated.");
             }
 
@@ -46,20 +45,19 @@ namespace IEvangelist.DotNet.MiglifierTests
         ]
         public async Task MinifiesAndUglifiesAllContentsOf(string path, TargetType type)
         {
-            var startDateTime = DateTime.UtcNow;
             var result = await MinifierAndUglifier.MiglifyAsync(path);
             Assert.True(result.ExitCode == 0, "Expected successful execution.");
             Assert.True(result.Files.Any(), "Expected results to have output.");
 
             foreach (var file in result.Files)
             {
-                var originalSize = new FileInfo(file.OriginalPath).Length;
+                var originalFile = new FileInfo(file.OriginalPath);
                 var minifiedFile = new FileInfo(file.MiglifiedPath);
 
-                Assert.True(originalSize > minifiedFile.Length,
-                            $"Expected minification to make {type} file smaller.");
-                Assert.True(minifiedFile.LastWriteTimeUtc > startDateTime,
-                            $"Expected {type} file to have been updated.");
+                Assert.True(originalFile.Length > minifiedFile.Length,
+                            $"Expected minification to make {file.Type} file smaller.");
+                Assert.True(minifiedFile.LastWriteTimeUtc > originalFile.LastWriteTimeUtc,
+                            $"Expected {file.Type} file to have been updated.");
             }
 
             Assert.True(result.Files.All(t => t.Type == type),
