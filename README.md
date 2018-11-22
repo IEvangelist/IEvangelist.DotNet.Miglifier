@@ -1,3 +1,7 @@
+# Status
+
+[![Build status](https://dev.azure.com/davidpine/IEvangelist.DotNet.Miglifier/_apis/build/status/IEvangelist.DotNet.Miglifier%20.NET%20Core-CI)](https://dev.azure.com/davidpine/IEvangelist.DotNet.Miglifier/_build/latest?definitionId=4)
+
 # The "Miglifier" Explained 😅
 
 Obviously "miglifier" is a made up word but it's fun to say...nonetheless, it still serves a purpose. This __Global .NET Tool__ both "minifies" and "uglifies" thus it "miglifies" CSS, JavaScript and HTML files in-place. I've yet to add bundling configuration or anything like that at this point. Nor, are there any options for how to perform various optimizations. It simply relys on all the defaults, more to come as time permits. But for now, this can be used as a part of your build tooling to minify and uglify files in-place. The files are _not_ re-located.
