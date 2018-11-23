@@ -1,7 +1,5 @@
 ﻿using IEvangelist.DotNet.Miglifier.Core;
 using McMaster.Extensions.CommandLineUtils;
-using Newtonsoft.Json;
-using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -19,10 +17,9 @@ namespace IEvangelist.DotNet.Miglifier
     {
         [
             FileOrDirectoryExists,
-            Required(ErrorMessage = Constants.PathErrorMessage),
             Argument(0, Constants.PathName, Constants.PathDescription)
         ]
-        public string Path { get; }
+        public string Path { get; } = "wwwroot";
 
         public async Task<int> OnExecuteAsync(CommandLineApplication app)
         {
