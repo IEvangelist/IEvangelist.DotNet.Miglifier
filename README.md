@@ -15,7 +15,7 @@ To install the tool globally, execute the following command.
 dotnet tool install -g dotnet-miglifier
 ```
 
-Once installed you may invoke the tool by simply calling it's name and passing in the path for which you want it to "miglify" against, see below for example:
+Once installed you may invoke the tool by simply calling its name and passing in the path for which you want it to "miglify" against, see below for example:
 
 ```console
 dotnet-miglifier "wwwroot"
