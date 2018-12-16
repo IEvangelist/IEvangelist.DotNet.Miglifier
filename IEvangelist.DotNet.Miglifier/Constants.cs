@@ -9,15 +9,17 @@
         internal const string Description = "Minifies and Uglifies JavaScript, CSS and HTML files in place.";
 
         internal const string HelpText = @"
-You are required to provide the path to the web-root (commonly named 'wwwroot') directory.
+You could optionally to provide the path to the web-root (commonly named 'wwwroot') directory. Additionally, you are able to provide a the miglify.json file path.
 
 Example:
-miglifier ""wwwroot"" ";
-
-        internal const string PathErrorMessage = "Please specify the path to the web-root (commonly named 'wwwroot') directory.";
+miglifier ""wwwroot"" ""../../config/miglify.json"" ";
 
         internal const string PathName = "path";
 
         internal const string PathDescription = "Path to the web-root (commonly named 'wwwroot') directory.";
+
+        internal const string MiglifyJsonPathName = "miglify-json";
+
+        internal const string MiglifyJsonPathDescription = "Path to the miglify.json file.";
     }
 }

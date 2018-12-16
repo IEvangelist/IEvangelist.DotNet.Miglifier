@@ -1,6 +1,6 @@
 # Status
 
-[![NuGet version (dotnet-miglifier)](https://img.shields.io/nuget/v/dotnet-miglifier.svg?style=flat-square)](https://www.nuget.org/packages/dotnet-miglifier/)
+[![NuGet version (dotnet-miglifier)](https://img.shields.io/nuget/v/dotnet-miglifier.svg)](https://www.nuget.org/packages/dotnet-miglifier/)
 [![Build status](https://dev.azure.com/davidpine/IEvangelist.DotNet.Miglifier/_apis/build/status/IEvangelist.DotNet.Miglifier%20.NET%20Core-CI)](https://dev.azure.com/davidpine/IEvangelist.DotNet.Miglifier/_build/latest?definitionId=4)
 
 # The "Miglifier" Explained 😅
@@ -25,6 +25,7 @@ Processing 1 Css file(s).
 
 Processing 1 Js file(s).
         .\wwwroot\main.min.js
+		.\wwwroot\utilities.min.js
 
 Processing 1 Html file(s).
         .\wwwroot\main.min.html

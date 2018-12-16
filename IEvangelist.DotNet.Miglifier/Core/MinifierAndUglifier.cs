@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using IEvangelist.DotNet.Miglifier.Config;
+using IEvangelist.DotNet.Miglifier.Extensions;
 using McMaster.Extensions.CommandLineUtils;
 
 namespace IEvangelist.DotNet.Miglifier.Core
@@ -24,11 +26,17 @@ namespace IEvangelist.DotNet.Miglifier.Core
 
         static IConsole Console { get; } = PhysicalConsole.Singleton;
 
-        internal static async Task<MiglifyResult> MiglifyAsync(string wwwroot)
+        internal static async Task<MiglifyResult> MiglifyAsync(string wwwroot, string miglifyJson)
         {
             if (!Directory.Exists(wwwroot))
             {
                 throw new ArgumentException("The given directory does not exist.", nameof(wwwroot));
+            }
+
+            if (!string.IsNullOrWhiteSpace(miglifyJson) && !File.Exists(miglifyJson))
+            {
+                throw new ArgumentException("The given miglify.json file path does not exist.",
+                                            nameof(miglifyJson));
             }
 
             try
@@ -36,13 +44,8 @@ namespace IEvangelist.DotNet.Miglifier.Core
                 WriteLine("Scanning for CSS, JavaScript and HTML files to process.", ConsoleColor.Cyan);
                 WriteLine();
 
-                var results =
-                    GetCssFiles(wwwroot)
-                       .Select(css => new MiglifyFile(TargetType.Css, css))
-                       .Concat(GetJsFiles(wwwroot)
-                                  .Select(js => new MiglifyFile(TargetType.Js, js)))
-                       .Concat(GetHtmlFiles(wwwroot)
-                                  .Select(html => new MiglifyFile(TargetType.Html, html)));
+                var settings = await LoadMiglifySettingsAsync(miglifyJson);
+                var results = GetMiglifiedFiles(wwwroot, settings);
 
                 var buffer = new List<MiglifyFile>();
                 foreach (var (type, files) in results.GroupBy(f => f.Type)
@@ -61,7 +64,10 @@ namespace IEvangelist.DotNet.Miglifier.Core
 
                         var info = new FileInfo(path);
                         var minifiedName = $"{Path.GetFileNameWithoutExtension(info.Name)}.min{info.Extension}";
-                        var minifiedPath = Path.Combine(info.DirectoryName, minifiedName);
+                        var directorySettings = settings.Globs[file.Type];
+                        var outputPath = (directorySettings.Output ?? info.DirectoryName).ToFullPath();
+                        Directory.CreateDirectory(outputPath);
+                        var minifiedPath = Path.Combine(outputPath, minifiedName);
 
                         await File.WriteAllTextAsync(file.MiglifiedPath = minifiedPath, result.Code);
 
@@ -83,6 +89,39 @@ namespace IEvangelist.DotNet.Miglifier.Core
             }
         }
 
+        static IEnumerable<MiglifyFile> GetMiglifiedFiles(string wwwroot, MiglifySettings settings)
+            => wwwroot.Glob(settings.Globs[MiglifyType.Css].Input)
+                      .Select(css =>
+                              new MiglifyFile(
+                                  MiglifyType.Css,
+                                  css,
+                                  file => Uglify.Css(file, settings.CssSettings)))
+                      .Concat(
+                           wwwroot.Glob(settings.Globs[MiglifyType.Js].Input)
+                                  .Select(js =>
+                                          new MiglifyFile(
+                                              MiglifyType.Js,
+                                              js,
+                                              file => Uglify.Js(file, settings.JavaScriptSettings))))
+                      .Concat(
+                           wwwroot.Glob(settings.Globs[MiglifyType.Html].Input)
+                                  .Select(html =>
+                                          new MiglifyFile(
+                                              MiglifyType.Html,
+                                              html,
+                                              file => Uglify.Html(file, settings.HtmlSettings))));
+
+        static async Task<MiglifySettings> LoadMiglifySettingsAsync(string miglifyJson)
+        {
+            if (string.IsNullOrWhiteSpace(miglifyJson) || !File.Exists(miglifyJson))
+            {
+                return new MiglifySettings();
+            }
+
+            var json = await File.ReadAllTextAsync(miglifyJson);
+            return json.To<MiglifySettings>();
+        }
+
         static bool IsErrorFree(UglifyResult result)
         {
             result.Errors?.ForEach(e =>
@@ -99,25 +138,7 @@ namespace IEvangelist.DotNet.Miglifier.Core
 
             return !result.HasErrors;
         }
-
-        static IEnumerable<FileInfo> GetAllFiles(string wwwroot, string searchPattern) 
-            => Directory.EnumerateFiles(wwwroot, searchPattern, Options)
-                        .Select(file => new FileInfo(file));
-
-        static IEnumerable<string> GetCssFiles(string wwwroot)
-            => GetFilesByExtension(wwwroot, CascadingStyleSheetsExtension);
-
-        static IEnumerable<string> GetJsFiles(string wwwroot)
-            => GetFilesByExtension(wwwroot, JavaScriptExtension);
-
-        static IEnumerable<string> GetHtmlFiles(string wwwroot)
-            => GetFilesByExtension(wwwroot, HyperTextMarkupLanguageExtension);
-
-        static IEnumerable<string> GetFilesByExtension(string wwwroot, string extension)
-            => GetAllFiles(wwwroot, $"*{extension}")
-                   .Where(file => !file.Name.Contains(".min.", StringComparison.OrdinalIgnoreCase))
-                   .Select(file => file.FullName);
-
+        
         static void WriteLine(string message = null, ConsoleColor? color = null)
         {
             try

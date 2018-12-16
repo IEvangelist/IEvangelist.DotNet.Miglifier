@@ -1,6 +1,6 @@
 ﻿namespace IEvangelist.DotNet.Miglifier.Core
 {
-    public enum TargetType
+    public enum MiglifyType
     {
         Css,
         Html,

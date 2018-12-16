@@ -21,6 +21,12 @@ namespace IEvangelist.DotNet.Miglifier
         ]
         public string Path { get; } = "wwwroot";
 
+        [
+            FileOrDirectoryExists,
+            Argument(1, Constants.MiglifyJsonPathName, Constants.MiglifyJsonPathDescription)
+        ]
+        public string MiglifyJsonPath { get; }
+
         public async Task<int> OnExecuteAsync(CommandLineApplication app)
         {
             if (!Directory.Exists(Path))
@@ -29,7 +35,7 @@ namespace IEvangelist.DotNet.Miglifier
                 return 1;
             }
 
-            var result = await MinifierAndUglifier.MiglifyAsync(Path);
+            var result = await MinifierAndUglifier.MiglifyAsync(Path, MiglifyJsonPath);
             return result.ExitCode;
         }
     }

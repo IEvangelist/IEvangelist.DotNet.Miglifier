@@ -5,9 +5,11 @@ using NUglify;
 
 namespace IEvangelist.DotNet.Miglifier.Core
 {
-    internal class MiglifyFile
+    class MiglifyFile
     {
-        internal TargetType Type { get; }
+        readonly Func<string, UglifyResult> _uglify;
+
+        internal MiglifyType Type { get; }
 
         internal string OriginalPath { get; }
 
@@ -15,28 +17,23 @@ namespace IEvangelist.DotNet.Miglifier.Core
 
         internal Task<UglifyResult> ProcessAsync { get; }
 
-        internal MiglifyFile(TargetType type, string originalPath)
+        internal MiglifyFile(
+            MiglifyType type, 
+            string originalPath, 
+            Func<string, UglifyResult> uglify)
         {
             Type = type;
             OriginalPath = originalPath;
+
+            _uglify = uglify;
+
             ProcessAsync = GetProcessingTask();
         }
 
         async Task<UglifyResult> GetProcessingTask()
         {
             var file = await File.ReadAllTextAsync(OriginalPath);
-            switch (Type)
-            {
-                case TargetType.Css:
-                    return Uglify.Css(file);
-                case TargetType.Html:
-                    return Uglify.Html(file);
-                case TargetType.Js:
-                    return Uglify.Js(file);
-
-                default:
-                    throw new ArgumentException(nameof(Type));
-            }
+            return _uglify(file);
         }
 
         public void Deconstruct(

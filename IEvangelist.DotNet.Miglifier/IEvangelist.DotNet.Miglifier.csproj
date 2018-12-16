@@ -18,9 +18,9 @@
 
   <ItemGroup>
     <PackageReference Include="Centare.Extensions" Version="1.0.19" />
-    <PackageReference Include="Glob" Version="0.4.0" />
+    <PackageReference Include="Glob" Version="1.0.4" />
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.2.5" />
-    <PackageReference Include="Humanizer.Core" Version="2.5.1" />
+    <PackageReference Include="Humanizer.Core" Version="2.5.16" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="NUglify" Version="1.5.12" />
   </ItemGroup>

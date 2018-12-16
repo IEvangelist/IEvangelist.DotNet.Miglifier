@@ -13,6 +13,9 @@
     <None Remove="wwwroot\only.css" />
     <None Remove="wwwroot\only.html" />
     <None Remove="wwwroot\only.js" />
+    <None Remove="wwwroot\testing\1.css" />
+    <None Remove="wwwroot\testing\2.html" />
+    <None Remove="wwwroot\testing\3.js" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,6 +35,15 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="wwwroot\main.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="wwwroot\testing\1.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="wwwroot\testing\2.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="wwwroot\testing\3.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
